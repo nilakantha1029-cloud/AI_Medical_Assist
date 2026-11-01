@@ -1,0 +1,41 @@
+# ---------- Secrets (NEVER commit) ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Python virtual environments ----------
+aimavenv/
+venv/
+.venv/
+env/
+ENV/
+
+# ---------- Python cache / build ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---------- Local data (contains patient names + emails) ----------
+# The app recreates the database and seeds the doctors on first start.
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# ---------- Logs ----------
+*.log
+
+# ---------- Editors / OS ----------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*.docx

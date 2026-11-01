@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>City Hospital – Talk to Sarah</title>
+    <style>
+      :root {
+        --ink: #12313b;
+        --paper: #f1f6f7;
+        --card: #fff;
+        --teal: #0e7c86;
+        --teal-d: #0a5b63;
+        --line: #d3e1e3;
+        --muted: #51707a;
+        --alert: #b3322c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          16px/1.5 "Segoe UI",
+          system-ui,
+          "Noto Sans",
+          "Noto Sans Devanagari",
+          "Noto Sans Telugu",
+          sans-serif;
+      }
+      header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--line);
+        background: var(--card);
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+      header span {
+        color: var(--muted);
+        font-weight: 400;
+        margin-left: 10px;
+      }
+      main {
+        max-width: 520px;
+        margin: 32px auto;
+        padding: 0 16px;
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.15;
+        margin: 0 0 4px;
+      }
+      .sub {
+        color: var(--muted);
+        margin: 0 0 20px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px;
+      }
+      label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 14px 0 4px;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font: inherit;
+        background: #fff;
+        color: inherit;
+      }
+      input:focus-visible,
+      select:focus-visible,
+      button:focus-visible {
+        outline: 3px solid #7cc4cb;
+        outline-offset: 1px;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+        border: 0;
+        border-radius: 8px;
+        padding: 11px 16px;
+        font-weight: 600;
+      }
+      .primary {
+        background: var(--teal);
+        color: #fff;
+        width: 100%;
+        margin-top: 20px;
+      }
+      .primary:hover {
+        background: var(--teal-d);
+      }
+      .ghost {
+        background: #e4eef0;
+        color: var(--ink);
+      }
+      .ghost[aria-pressed="true"] {
+        background: var(--ink);
+        color: #fff;
+      }
+      .end {
+        background: var(--alert);
+        color: #fff;
+      }
+      .err {
+        color: var(--alert);
+        font-size: 14px;
+        margin: 12px 0 0;
+        min-height: 1em;
+      }
+      #call {
+        display: none;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .avatar {
+        position: relative;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--teal);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+        font-weight: 600;
+        flex: none;
+      }
+      .avatar::after {
+        content: "";
+        position: absolute;
+        inset: -7px;
+        border-radius: 50%;
+        border: 3px solid var(--teal);
+        opacity: 0;
+      }
+      .speaking .avatar::after {
+        animation: ring 1.2s ease-out infinite;
+      }
+      @keyframes ring {
+        from {
+          transform: scale(0.9);
+          opacity: 0.8;
+        }
+        to {
+          transform: scale(1.25);
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .speaking .avatar::after {
+          animation: none;
+          opacity: 0.7;
+        }
+      }
+      .who b {
+        display: block;
+      }
+      .who small {
+        color: var(--muted);
+      }
+      #timer {
+        margin-left: auto;
+        font-variant-numeric: tabular-nums;
+        color: var(--muted);
+      }
+      #log {
+        height: 300px;
+        overflow: auto;
+        margin: 18px 0 10px;
+        padding: 12px;
+        background: var(--paper);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .m {
+        max-width: 85%;
+        padding: 8px 12px;
+        border-radius: 12px;
+        white-space: pre-wrap;
+      }
+      .m.sarah {
+        background: #fff;
+        border: 1px solid var(--line);
+        align-self: flex-start;
+      }
+      .m.you {
+        background: var(--teal);
+        color: #fff;
+        align-self: flex-end;
+      }
+      .m.error {
+        background: #fbe9e7;
+        color: var(--alert);
+        align-self: center;
+        font-size: 14px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+      }
+      .row input {
+        flex: 1;
+      }
+      .ctl {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .ctl button {
+        flex: 1;
+      }
+      video {
+        width: 100%;
+        max-height: 160px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-top: 12px;
+        background: #000;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>City Hospital<span>Appointments</span></header>
+    <main>
+      <h1>Talk to Sarah</h1>
+      <p class="sub">Our automated voice assistant.</p>
+
+      <section class="card" id="setup">
+        <label for="name">Patient name</label
+        ><input id="name" autocomplete="name" />
+        <label for="email">Email ID</label
+        ><input id="email" type="email" autocomplete="email" />
+        <label for="lang">Language</label>
+        <select id="lang">
+          <option value="en-IN">English (India)</option>
+          <option value="hi-IN">Hindi (हिंदी)</option>
+          <option value="te-IN">Telugu (తెలుగు)</option>
+        </select>
+        <button class="primary" id="start">Start voice call</button>
+        <p class="err" id="setupErr" role="alert"></p>
+      </section>
+
+      <section class="card" id="call">
+        <div class="top" id="top">
+          <div class="avatar">S</div>
+          <div class="who">
+            <b>Sarah (Receptionist)</b><small id="status">Connecting...</small>
+          </div>
+          <div id="timer">00:00</div>
+        </div>
+        <div id="log" aria-live="polite"></div>
+        <form class="row" id="form">
+          <input
+            id="msg"
+            placeholder="Or type your message"
+            autocomplete="off"
+            aria-label="Message"
+          /><button class="ghost" type="submit">Send</button>
+        </form>
+        <video id="cam" autoplay muted playsinline></video>
+        <button class="primary" id="talkBtn" type="button">🎤 Tap to speak</button>
+        <p class="sub" style="margin:8px 0 0;font-size:14px">Tap the button, speak, then pause. Sarah answers by voice. You can also type below.</p>
+        <div class="ctl">
+          <button class="ghost" id="micBtn" aria-pressed="false">
+            Mute mic
+          </button>
+          <button class="ghost" id="camBtn" aria-pressed="false">
+            Camera off
+          </button>
+          <button class="end" id="endBtn">End call</button>
+        </div>
+      </section>
+    </main>
+    <script>
+      const $ = (s) => document.querySelector(s),
+        SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let sid = null,
+        inCall = false,
+        micOn = true,
+        busy = false,
+        rec = null,
+        audio = null,
+        camStream = null,
+        timerId = null;
+      const lang = () => $("#lang").value;
+      const STATUS = {
+        thinking: "Sarah is thinking...",
+        speaking: "Sarah is speaking",
+        listening: "Listening...",
+        idle: "Your turn",
+      };
+      function setState(s){$('#status').textContent=STATUS[s]||s;$('#top').classList.toggle('speaking',s==='speaking');
+      $('#talkBtn').textContent=s==='listening'?'🎤 Listening... speak now':'🎤 Tap to speak'}
+      function add(cls, text) {
+        const d = document.createElement("div");
+        d.className = "m " + cls;
+        d.textContent = text;
+        $("#log").append(d);
+        $("#log").scrollTop = 1e9;
+      }
+
+      function speak(b64, text) {
+        return new Promise((res) => {
+          setState("speaking");
+          if (b64) {
+            audio = new Audio("data:audio/mp3;base64," + b64);
+            audio.onended = audio.onerror = () => res();
+            audio.play().catch(() => res());
+          } else if ("speechSynthesis" in window) {
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = lang();
+            u.onend = u.onerror = () => res();
+            speechSynthesis.speak(u);
+          } else res();
+        });
+      }
+
+      function listen() {
+        if(rec){rec.onend=rec.onresult=rec.onerror=null;try{rec.abort()}catch(e){}}
+        if (!inCall || !micOn || busy || !SR) {
+          if (inCall && !busy) setState("idle");
+          return;
+        }
+        rec = new SR();
+        rec.lang = lang();
+        let got = false;
+        rec.onresult = (e) => {
+          got = true;
+          send(e.results[0][0].transcript);
+        };
+        rec.onend = () => {
+          if (!got && inCall && micOn && !busy) setTimeout(listen, 300);
+        };
+        rec.onerror = (e) => {
+          if (e.error === "not-allowed") {
+            micOn = false;
+            add(
+              "error",
+              "Microphone blocked. Allow mic access or type your message.",
+            );
+            setState("idle");
+          }
+        };
+        try {
+          rec.start();
+          setState("listening");
+        } catch (e) {}
+      }
+
+      async function send(text) {
+        text = text.trim();
+        if (!inCall || busy || !text) return;
+        busy = true;
+        add("you", text);
+        setState("thinking");
+        try {
+          const r = await fetch("/agent/message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              session_id: sid,
+              text,
+              language_code: lang(),
+              patient_name: $("#name").value.trim(),
+              patient_email: $("#email").value.trim(),
+            }),
+          });
+          const d = await r.json();
+          if (!r.ok || d.error) throw new Error(d.error || "Request failed");
+          sid = d.session_id;
+          add("sarah", d.text);
+          if (inCall) await speak(d.audio, d.text);
+        } catch (e) {
+          add("error", e.message+' Tap "Tap to speak" or type to try again.');
+        }
+        busy = false;
+        listen();
+      }
+
+      async function start() {
+        const name = $("#name").value.trim(),
+          email = $("#email").value.trim(),
+          err = $("#setupErr");
+        err.textContent = "";
+        if (!name || !/^\S+@\S+\.\S+$/.test(email)) {
+          err.textContent = "Enter your name and a valid email address.";
+          return;
+        }
+        let micBlocked=false;
+        try {
+          if(SR){try{(await navigator.mediaDevices.getUserMedia({audio:true})).getTracks().forEach(t=>t.stop())}catch(e){micBlocked=true}}
+          const r = await fetch("/agent/new_session", { method: "POST" });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error);
+          sid = d.session_id;
+        } catch (e) {
+          err.textContent =
+            e.message || "Cannot reach the server. Is it running?";
+          return;
+        }
+        inCall = true;
+        $("#setup").style.display = "none";
+        $("#call").style.display = "block";
+        const t0 = Date.now();
+        timerId = setInterval(() => {
+          const s = Math.floor((Date.now() - t0) / 1000);
+          $("#timer").textContent =
+            String(Math.floor(s / 60)).padStart(2, "0") +
+            ":" +
+            String(s % 60).padStart(2, "0");
+        }, 1000);
+        if(micBlocked)add('error','Microphone is blocked. Click the lock icon in the address bar, allow Microphone, and reload. You can still type.');
+        if (!SR)
+          add(
+            "error",
+            "Voice input is not supported in this browser (use Chrome or Edge). You can type instead.",
+          );
+        send("Hello");
+      }
+
+      function end() {
+        inCall = false;
+        busy = false;
+        clearInterval(timerId);
+        rec && rec.abort();
+        audio && audio.pause();
+        speechSynthesis && speechSynthesis.cancel();
+        camStream && camStream.getTracks().forEach((t) => t.stop());
+        camStream = null;
+        $("#cam").style.display = "none";
+        $("#log").innerHTML = "";
+        $("#timer").textContent = "00:00";
+        sid = null;
+        $("#call").style.display = "none";
+        $("#setup").style.display = "block";
+      }
+
+      $('#start').onclick=start;$('#endBtn').onclick=end;
+      $('#talkBtn').onclick=()=>{if(busy||!inCall)return;audio&&audio.pause();speechSynthesis&&speechSynthesis.cancel();
+        micOn=true;$('#micBtn').setAttribute('aria-pressed',false);$('#micBtn').textContent='Mute mic';listen()};
+      $("#form").onsubmit = (e) => {
+        e.preventDefault();
+        const v = $("#msg").value;
+        $("#msg").value = "";
+        rec && rec.abort();
+        send(v);
+      };
+      $("#micBtn").onclick = (e) => {
+        micOn = !micOn;
+        e.target.setAttribute("aria-pressed", !micOn);
+        e.target.textContent = micOn ? "Mute mic" : "Unmute mic";
+        micOn ? listen() : (rec && rec.abort(), setState("idle"));
+      };
+      $("#camBtn").onclick = async (e) => {
+        if (camStream) {
+          camStream.getTracks().forEach((t) => t.stop());
+          camStream = null;
+          $("#cam").style.display = "none";
+          e.target.textContent = "Camera off";
+          e.target.setAttribute("aria-pressed", false);
+          return;
+        }
+        try {
+          camStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+          });
+          $("#cam").srcObject = camStream;
+          $("#cam").style.display = "block";
+          e.target.textContent = "Camera on";
+          e.target.setAttribute("aria-pressed", true);
+        } catch (_) {
+          add("error", "Camera unavailable or blocked.");
+        }
+      };
+    </script>
+  </body>
+</html>
